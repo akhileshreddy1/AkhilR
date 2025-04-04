@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         IMAGE_NAME = "my-app"
-        DOCKER_HUB_REPO = "rajitha360"
+        DOCKER_HUB_REPO = "rajitha360/my-app" // Make sure this matches your actual repo name on Docker Hub
         DOCKER_REGISTRY_CREDENTIALS = "dockerhubcredentials"
     }
 
@@ -17,7 +17,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh "docker build -t ${DOCKER_HUB_REPO}:latest ."
+                    sh "docker build -t ${DOCKER_HUB_REPO}:${BUILD_NUMBER} ."
                 }
             }
         }
@@ -26,7 +26,7 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry(credentialsId: DOCKER_REGISTRY_CREDENTIALS, url: '') {
-                        sh "docker push ${DOCKER_HUB_REPO}:latest"
+                        sh "docker push ${DOCKER_HUB_REPO}:${BUILD_NUMBER}"
                     }
                 }
             }
@@ -36,7 +36,7 @@ pipeline {
             steps {
                 script {
                     sh "docker stop ${IMAGE_NAME} || true && docker rm ${IMAGE_NAME} || true"
-                    sh "docker run -d -p 3000:3000 --name ${IMAGE_NAME} ${DOCKER_HUB_REPO}:latest"
+                    sh "docker run -d -p 3000:3000 --name ${IMAGE_NAME} ${DOCKER_HUB_REPO}:${BUILD_NUMBER}"
                 }
             }
         }
