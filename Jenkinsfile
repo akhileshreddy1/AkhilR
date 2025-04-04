@@ -3,14 +3,14 @@ pipeline {
 
     environment {
         IMAGE_NAME = "my-app"
-        DOCKER_HUB_REPO = "rajitha390/my-app"
+        DOCKER_HUB_REPO = "rajitha360"
         DOCKER_REGISTRY_CREDENTIALS = "dockerhubcredentials"
     }
 
     stages {
         stage('Clone Repository') {
             steps {
-                git branch: 'main', url: 'https://https://github.com/rajitha690/my-app.git'
+                git branch: 'main', url: 'https://github.com/rajitha690/my-app.git'
             }
         }
 
