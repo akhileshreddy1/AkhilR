@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         IMAGE_NAME = "my-app"
-        DOCKER_HUB_REPO = "rajitha360/my-app" // Make sure this matches your actual repo name on Docker Hub
+        DOCKER_HUB_REPO = "rajitha390/my-app" // ✅ Corrected username
         DOCKER_REGISTRY_CREDENTIALS = "docker-credentials"
     }
 
