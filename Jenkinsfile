@@ -1,16 +1,22 @@
+
 pipeline {
     agent any
 
     environment {
         IMAGE_NAME = "my-app"
-        DOCKER_HUB_REPO = "akhileshreddy1/my-app" // ✅ Corrected username
+        DOCKER_HUB_REPO = "akhileshreddy1/my-app"  // ✅ Corrected username
         DOCKER_REGISTRY_CREDENTIALS = "docker-credentials"
+        GIT_CREDENTIALS = "github-credentials"  // Credentials ID for GitHub
     }
 
     stages {
         stage('Clone Repository') {
             steps {
-                git branch: 'main', url: 'https://github.com/akhileshreddy1/my-app.git'
+                git(
+                    branch: 'main',
+                    url: 'https://github.com/akhileshreddy1/my-app.git',
+                    credentialsId: GIT_CREDENTIALS  // Use the Git credentials ID here
+                )
             }
         }
 
