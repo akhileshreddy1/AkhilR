@@ -3,11 +3,11 @@ pipeline {
 
     environment {
         // Docker image name
-        IMAGE_NAME = 'nodejs-app'
+        IMAGE_NAME = 'my-app'
         // Docker Hub credentials ID
-        DOCKER_CREDENTIALS = 'docker-credentials-id'
+        DOCKER_CREDENTIALS = 'docker'
         // Docker Hub repository (adjust to your Docker Hub username)
-        DOCKER_REPO = 'your-dockerhub-username'
+        DOCKER_REPO = 'akhileshreddy1/my-app'
         // Node.js version
         NODE_VERSION = '16'
     }
@@ -33,7 +33,7 @@ pipeline {
             steps {
                 script {
                     // Login to Docker Hub
-                    docker.withRegistry('https://index.docker.io/v1/', DOCKER_CREDENTIALS) {
+                    docker.withRegistry('https://hub.docker.com/r/akhileshreddy1/my-app', DOCKER_CREDENTIALS) {
                         // Push the image to Docker Hub
                         docker.image("${DOCKER_REPO}/${IMAGE_NAME}:${env.BUILD_ID}").push()
                     }
