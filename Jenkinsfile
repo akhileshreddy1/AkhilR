@@ -1,54 +1,71 @@
-
 pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "my-app"
-        DOCKER_HUB_REPO = "akhileshreddy1/my-app" // ✅ Corrected username
-        DOCKER_REGISTRY_CREDENTIALS = "docker-credentials"
+        // Docker image name
+        IMAGE_NAME = 'nodejs-app'
+        // Docker Hub credentials ID
+        DOCKER_CREDENTIALS = 'docker-credentials-id'
+        // Docker Hub repository (adjust to your Docker Hub username)
+        DOCKER_REPO = 'your-dockerhub-username'
+        // Node.js version
+        NODE_VERSION = '16'
     }
 
     stages {
-        stage('Clone Repository') {
+        stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/akhileshreddy1/my-app.git'
+                // Checkout the repository code
+                checkout scm
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh "docker build -t ${DOCKER_HUB_REPO}:${BUILD_NUMBER} ."
+                    // Build the Docker image
+                    docker.build("${DOCKER_REPO}/${IMAGE_NAME}:${env.BUILD_ID}")
                 }
             }
         }
 
-        stage('Push Image to Docker Hub') {
+        stage('Push Docker Image') {
             steps {
                 script {
-                    withDockerRegistry(credentialsId: DOCKER_REGISTRY_CREDENTIALS, url: '') {
-                        sh "docker push ${DOCKER_HUB_REPO}:${BUILD_NUMBER}"
+                    // Login to Docker Hub
+                    docker.withRegistry('https://index.docker.io/v1/', DOCKER_CREDENTIALS) {
+                        // Push the image to Docker Hub
+                        docker.image("${DOCKER_REPO}/${IMAGE_NAME}:${env.BUILD_ID}").push()
                     }
                 }
             }
         }
 
-        stage('Deploy Container') {
+        stage('Deploy Docker Container') {
             steps {
                 script {
-                    sh "docker stop ${IMAGE_NAME} || true && docker rm ${IMAGE_NAME} || true"
-                    sh "docker run -d -p 3000:3000 --name ${IMAGE_NAME} ${DOCKER_HUB_REPO}:${BUILD_NUMBER}"
+                    // Pull the Docker image from Docker Hub (or use a remote server for deployment)
+                    sh """
+                    docker pull ${DOCKER_REPO}/${IMAGE_NAME}:${env.BUILD_ID}
+                    docker run -d -p 3000:3000 --name nodejs-app ${DOCKER_REPO}/${IMAGE_NAME}:${env.BUILD_ID}
+                    """
                 }
             }
         }
     }
 
     post {
-        success {
-            echo "Deployment successful! 🎉"
+        always {
+            // Cleanup docker containers and images after the pipeline run
+            sh 'docker system prune -f'
         }
+
+        success {
+            echo "Deployment completed successfully!"
+        }
+
         failure {
-            echo "Deployment failed! ❌"
+            echo "Deployment failed."
         }
     }
 }
